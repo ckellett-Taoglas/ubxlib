@@ -37,7 +37,7 @@
 #include "u_port_gpio.h" // For unblocking
 #include "u_port_i2c.h"
 
-#ifdef STM32U575xx
+#if defined(STM32U575xx) || defined(STM32U585xx)
 # include "stm32u5xx_ll_bus.h"
 # include "stm32u5xx_ll_gpio.h"
 # include "stm32u5xx_ll_i2c.h"

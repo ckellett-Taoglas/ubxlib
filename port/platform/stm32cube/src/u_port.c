@@ -42,6 +42,9 @@
 #ifdef STM32U575xx
 # include "stm32u575xx.h"
 # include "stm32u5xx_hal.h"
+#elif STM32U585xx
+# include "stm32u585xx.h"
+# include "stm32u5xx_hal.h"
 #else
 # include "FreeRTOS.h" // For xPortGetFreeHeapSize()
 # include "task.h"     // For taskENTER_CRITICAL()/taskEXIT_CRITICAL()
@@ -92,7 +95,7 @@ static void systemClockConfig(void)
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-#ifdef STM32U575xx
+#if defined(STM32U575xx) || defined(STM32U585xx)
     // Configure the main internal regulator output voltage
     if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK) {
         U_ASSERT(false);

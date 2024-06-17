@@ -20,7 +20,7 @@
 
 #include "stdbool.h"
 
-#ifdef STM32U575xx
+#if defined(STM32U575xx) || defined(STM32U585xx)
 # include "stm32u5xx.h"
 # include "core_cm33.h"
 #else

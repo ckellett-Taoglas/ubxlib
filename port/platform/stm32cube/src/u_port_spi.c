@@ -39,7 +39,7 @@
 #include "u_port_os.h"
 #include "u_port_spi.h"
 
-#ifdef STM32U575xx
+#if defined(STM32U575xx) || defined(STM32U585xx)
 # include "stm32u5xx_ll_bus.h"
 # include "stm32u5xx_ll_rcc.h"
 # include "stm32u5xx_ll_gpio.h"
@@ -112,7 +112,7 @@ static SPI_TypeDef *const gpSpiReg[] = {NULL,  // This to avoid having to -1
                                         SPI1,
                                         SPI2,
                                         SPI3,
-#ifndef STM32U575xx
+#if !defined(STM32U575xx) && !defined(STM32U585xx)
                                         SPI4,
                                         SPI5,
                                         SPI6
@@ -153,7 +153,7 @@ static int32_t getSpi(const SPI_TypeDef *pReg)
 // so we use MSIK instead which defaults to 4 MHz.
 static void clockCfg(int32_t spi)
 {
-#ifdef STM32U575xx
+#if defined(STM32U575xx) || defined(STM32U585xx)
     switch (spi) {
         case 1:
             __HAL_RCC_SPI1_CONFIG(RCC_SPI1CLKSOURCE_MSIK);
@@ -192,7 +192,7 @@ static int32_t clockEnable(const SPI_TypeDef *pReg)
             __HAL_RCC_SPI3_CLK_ENABLE();
             errorCodeOrSpi = (int32_t) U_ERROR_COMMON_SUCCESS;
             break;
-#ifndef STM32U575xx
+#if !defined(STM32U575xx) && !defined(STM32U585xx)
         case 4:
             __HAL_RCC_SPI4_CLK_ENABLE();
             errorCodeOrSpi = (int32_t) U_ERROR_COMMON_SUCCESS;
@@ -232,7 +232,7 @@ static int32_t clockDisable(const SPI_TypeDef *pReg)
             __HAL_RCC_SPI3_CLK_DISABLE();
             errorCodeOrSpi = (int32_t) U_ERROR_COMMON_SUCCESS;
             break;
-#ifndef STM32U575xx
+#if !defined(STM32U575xx) && !defined(STM32U585xx)
         case 4:
             __HAL_RCC_SPI4_CLK_DISABLE();
             errorCodeOrSpi = (int32_t) U_ERROR_COMMON_SUCCESS;
@@ -259,7 +259,7 @@ static uint32_t getClock(const SPI_TypeDef *pReg)
     uint32_t clock = LL_RCC_PERIPH_FREQUENCY_NO;
     int32_t spi = getSpi(pReg);
 
-#ifndef STM32U575xx
+#if !defined(STM32U575xx) && !defined(STM32U585xx)
     LL_RCC_ClocksTypeDef rccClocks;
     LL_RCC_GetSystemClocksFreq(&rccClocks);
     // The clock for the STM32F4 case is always the peripheral
@@ -334,7 +334,7 @@ static int32_t getAf(int32_t spi, int32_t pin, uPortSpiPinType_t pinType)
     // if the CLK pin is on PA9/PD3 or the MOSI pin is on PC1, it is AF3.
     if ((spi == 3) && (pinType != U_PORT_SPI_PIN_TYPE_MOSI) && (pin != 0x36)) {
         af = LL_GPIO_AF_6;
-#ifdef STM32U575xx
+#if defined(STM32U575xx) || defined(STM32U585xx)
     } else if ((spi == 2) &&
                (((pinType == U_PORT_SPI_PIN_TYPE_CLK) && ((pin == 0x09) || (pin = 0x33))) ||
                 ((pinType == U_PORT_SPI_PIN_TYPE_MOSI) && (pin == 0x21)))) {
@@ -377,7 +377,7 @@ static int32_t configureSpi(SPI_TypeDef *pReg,
     // Disable the SPI block
     LL_SPI_Disable(pReg);
 
-#ifdef STM32U575xx
+#if defined(STM32U575xx) || defined(STM32U585xx)
     // On STM32U5 the SPI HW can get confused if it sees SELECT
     // as being low when master mode is enabled: it thinks the
     // slave may have pulled it low to perform some sort of
@@ -403,7 +403,7 @@ static int32_t configureSpi(SPI_TypeDef *pReg,
     // Baud rate control is a 3-bit value where 0 means /2, 1 means /4, etc.
     if ((powerOfTwoClockDivisor > 0) && (powerOfTwoClockDivisor <= 8)) {
         powerOfTwoClockDivisor--;
-#ifndef STM32U575xx
+#if !defined(STM32U575xx) && !defined(STM32U585xx)
         LL_SPI_SetBaudRatePrescaler(pReg, powerOfTwoClockDivisor << SPI_CR1_BR_Pos);
 #else
         LL_SPI_SetBaudRatePrescaler(pReg, powerOfTwoClockDivisor << SPI_CFG1_MBR_Pos);
@@ -466,7 +466,7 @@ static int32_t transfer(int32_t spi, const char *pSend, size_t bytesToSend,
     }
 
     if (transferSize > 0) {
-#ifdef STM32U575xx
+#if defined(STM32U575xx) || defined(STM32U585xx)
         // For STM32U5 have to set transfer size
         // (noting that threshold is by default 0,
         // meaning no RX FIFO, so we can just leave
@@ -481,7 +481,7 @@ static int32_t transfer(int32_t spi, const char *pSend, size_t bytesToSend,
         }
         // Do the blocking send/receive
         while (transferSize > 0) {
-#ifdef STM32U575xx
+#if defined(STM32U575xx) || defined(STM32U585xx)
             // For STM32U5 have to set CSTART also
             LL_SPI_StartMasterTransfer(pReg);
 #endif
@@ -495,14 +495,14 @@ static int32_t transfer(int32_t spi, const char *pSend, size_t bytesToSend,
                 LL_SPI_TransmitData8(pReg, *pSend);
             }
             // Wait for the data to be sent
-#ifndef STM32U575xx
+#if !defined(STM32U575xx) && !defined(STM32U585xx)
             while (!LL_SPI_IsActiveFlag_TXE(pReg)) {}
 #else
             while (!LL_SPI_IsActiveFlag_TXP(pReg)) {}
 #endif
             if (bytesToReceive > 0) {
                 // Wait for data to be received
-#ifndef STM32U575xx
+#if !defined(STM32U575xx) && !defined(STM32U585xx)
                 while (!LL_SPI_IsActiveFlag_RXNE(pReg)) {}
 #else
                 while (!LL_SPI_IsActiveFlag_RXP(pReg)) {}
@@ -538,7 +538,7 @@ static int32_t transfer(int32_t spi, const char *pSend, size_t bytesToSend,
                 pSend = (const char *) &fillWord;
             }
 
-#ifdef STM32U575xx
+#if defined(STM32U575xx) || defined(STM32U585xx)
             // For STM32U5 need to wait for end of
             // transaction and then clear both the
             // EOT and the TXTF flags otherwise the
@@ -564,7 +564,7 @@ static void getDevice(int32_t spi, uCommonSpiControllerDevice_t *pDevice)
 
     memset(pDevice, 0, sizeof(*pDevice));
     pDevice->pinSelect = gSpiData[spi].pinSelect;
-#ifndef STM32U575xx
+#if !defined(STM32U575xx) && !defined(STM32U585xx)
     pDevice->frequencyHertz = getClock(pReg) >> ((LL_SPI_GetBaudRatePrescaler(
                                                       pReg) >> SPI_CR1_BR_Pos) + 1);
 #else

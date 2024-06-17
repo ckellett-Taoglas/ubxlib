@@ -47,7 +47,7 @@
 # include "timers.h"
 #endif
 
-#ifdef STM32U575xx
+#if defined(STM32U575xx) || defined(STM32U585xx)
 # include "stm32u5xx_hal.h"
 # include "stm32u5xx_ll_bus.h"
 #else
@@ -163,7 +163,7 @@ static GPIO_TypeDef *const gpGpioReg[] = {GPIOA,
 #endif
                                          };
 
-#ifdef STM32U575xx
+#if defined(STM32U575xx) || defined(STM32U585xx)
 // Get the LL driver peripheral number for a given GPIO port,
 // all on AHB2 for STM32U5
 static const int32_t gLlApbGrpPeriphGpioPort[] = {LL_AHB2_GRP1_PERIPH_GPIOA,
@@ -271,13 +271,13 @@ static void enableSwo()
     ITM_TCR = 0; // Disable ITM
 
     // Initialize SWO (prescaler, etc.)
-#ifndef STM32U575xx
+#if defined(STM32U575xx) || defined(STM32U585xx)
     TPIU_SPPR = 0x00000002; // Select NRZ mode
     TPIU_ACPR = (SystemCoreClock / U_CFG_HW_SWO_CLOCK_HZ) - 1;
 #endif
     ITM_TPR = 0x00000000;
     DWT_CTRL = 0x400003FE;
-#ifndef STM32U575xx
+#if defined(STM32U575xx) || defined(STM32U585xx)
     FFCR = 0x00000100;
 #endif
 
@@ -1000,7 +1000,7 @@ void uPortPrivateGpioEnableClock(int32_t pin)
     U_ASSERT(port < sizeof(gLlApbGrpPeriphGpioPort) /
              sizeof(gLlApbGrpPeriphGpioPort[0]));
 
-#ifdef STM32U575xx
+#if defined(STM32U575xx) || defined(STM32U585xx)
     // All on AHB2 for STM32U5
     LL_AHB2_GRP1_EnableClock(gLlApbGrpPeriphGpioPort[port]);
 #else

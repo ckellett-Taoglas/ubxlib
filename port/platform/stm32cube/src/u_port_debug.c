@@ -36,6 +36,8 @@
 // For ITM_SendChar()
 #ifdef STM32U575xx
 # include "stm32u575xx.h"
+#elif STM32U585xx
+# include "stm32u585xx.h"
 #else
 # include "stm32f437xx.h"
 #endif

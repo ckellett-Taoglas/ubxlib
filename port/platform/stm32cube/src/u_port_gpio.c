@@ -29,7 +29,7 @@
 #include "u_port.h"
 #include "u_port_gpio.h"
 
-#ifdef STM32U575xx
+#if defined(STM32U575xx) || defined(STM32U585xx)
 # include "stm32u5xx_hal.h"
 # include "stm32u5xx_hal_gpio.h"
 #else
