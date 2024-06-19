@@ -872,7 +872,7 @@ void uartIrqHandler(uPortUartData_t *pUartData)
 #endif
 }
 
-#if defined(STM32U575xx) && U_CFG_HW_LPUART1_AVAILABLE
+#if (defined(STM32U575xx) || defined(STM32U585xx)) && U_CFG_HW_LPUART1_AVAILABLE
 // LPUART 1 interrupt handler, which we slot-in at index 0.
 void LPUART1_IRQHandler()
 {

@@ -39,10 +39,10 @@
 
 #include "u_heap_check.h"
 
-#ifdef STM32U575xx
+#if defined(STM32U575xx)
 # include "stm32u575xx.h"
 # include "stm32u5xx_hal.h"
-#elif STM32U585xx
+#elif defined(STM32U585xx)
 # include "stm32u585xx.h"
 # include "stm32u5xx_hal.h"
 #else
