@@ -178,12 +178,12 @@ int32_t uDevicePrivateI2cOpen(const uDeviceCfgI2c_t *pCfgI2c)
                 }
             }
             if ((errorCodeOrI2cHandle >= 0) && (pCfgI2c->maxSegmentSize > 0)) {
-                if (uPortI2cSetMaxSegmentSize(errorCodeOrI2cHandle, pCfgI2c->maxSegmentSize) < 0) {
+                // if (uPortI2cSetMaxSegmentSize(errorCodeOrI2cHandle, pCfgI2c->maxSegmentSize) < 0) {
                     // Clean up on error
                     uPortI2cClose(errorCodeOrI2cHandle);
                     // Return a meaningful error code
                     errorCodeOrI2cHandle = (int32_t) U_ERROR_COMMON_INVALID_PARAMETER;
-                }
+                // }
             }
             if (errorCodeOrI2cHandle >= 0) {
                 // Find a free entry in the list and put the I2C HW
